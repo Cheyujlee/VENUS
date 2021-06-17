@@ -7,7 +7,7 @@ usage = """Usage: %prog[-h] -r1 read1.fastq [-r2 read2.fastq, default: None]
                   [-scBarcodeWhitelist Whitelist file, default: Unspecified]
                   [-scCBstart Cell barcode start, default: Unspecified] [-scCBlen Cell barcode length, default: Unspecified] 
                   [-scUMIstart UMI start, default: Unspecified] [-scUMIlen UMI length, default: Unspecified]
-                  [-t Number of Threads, default: 8]"""
+                  [-t Number of Threads, default: 8] [-gtfTrueFalse ] [-qc True]"""
 
 def main():
     parser = argparse.ArgumentParser(description='VENUS')
@@ -19,6 +19,8 @@ def main():
     parser.add_argument('-o', '--outFileNamePrefix', required = False, metavar = 'Output file name prefix, default: cwd', type = str, default = '', help = 'Output directory to store the alignement results')
 
     parser.add_argument('-sc', '--solo', required = False, metavar = 'Single cell option, default: False', type = str, default = 'False', help = 'Single cell option switch')
+
+    # parser.add_argument('-scBarcodeWhitelist ', '--solo', required = False, metavar = 'Single cell option, default: False', type = str, default = 'False', help = 'Single cell option switch')
 
     parser.add_argument('-scCBstart', '--soloCBstart', required = False, metavar = 'Cell barcode start, default: Unspecified', type = str, default = '', help = 'Cell barcode start position in barcode read of single-cell seq')
 
@@ -50,7 +52,7 @@ def main():
             os.path.isfile(fq2)
             open(fq2, 'r')
         except IOError:
-            print('Error: There was no Read 1 FASTQ file!')
+            print('Error: There was no Read 2 FASTQ file!')
             sys.exit()
     
 
