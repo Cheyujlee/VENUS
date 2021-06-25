@@ -5,7 +5,7 @@ import sys
 # This is the current path to the default human genome index directory
 human_indexDir = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/indices/human.genomeDir/"
 # This is the current path to the default mega virus index directory
-virus_indexDir = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/indices/HIV.genomeDir/"
+virus_indexDir = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/indices/virus_hpv1.1.genomeDir/"
 
 
 ### Creates the Argument Parser object ###
@@ -14,9 +14,9 @@ parser = argparse.ArgumentParser(description="subtractive analysis of viral bulk
 
 ### Specifies the argument for bulk RNA-seq ###
 parser.add_argument("--read1", type=str, required=True,
-                    help="read1 of bulk RNA-seq (barcode)")
+                    help="read1 of bulk RNA-seq")
 parser.add_argument("--read2", type=str, required=False,
-                    help="read2 of bulk RNA-seq (cDNA)")
+                    help="read2 of bulk RNA-seq")
 # parser.add_argument("--indexDir", type=str, required=False, default=human_indexDir, 
 #                     help="user-specified genome index directory")
 parser.add_argument("--outDir", type=str, required=False, default=os.getcwd(), 
@@ -59,16 +59,16 @@ else:
         "--readFilesIn " + args.read1 + " " \
         "--outReadsUnmapped Fastx " + \
         "--outSAMtype None"
-# os.system(cmd)  # Command run
+os.system(cmd)  # Command run
 print("Running " + cmd)
 
 
 ### Appropriately renames the read1 & read2 for the virus mapping ###
 args.read1=human_outDir + "Unmapped.out.mate1.fastq"
-# os.rename(human_outDir + "Unmapped.out.mate1", args.read1)
+os.rename(human_outDir + "Unmapped.out.mate1", args.read1)
 if args.read2:
     args.read2=human_outDir + "Unmapped.out.mate2.fastq"
-    # os.rename(human_outDir + "Unmapped.out.mate2", args.read2)
+    os.rename(human_outDir + "Unmapped.out.mate2", args.read2)
 
 
 ### Concatenate and run the virus mapping in bash ###
@@ -86,7 +86,7 @@ else:
         "--genomeDir " + virus_indexDir + " " \
         "--readFilesIn " + args.read1 + " " \
         "--outFilterMultimapNmax 1"
-# os.system(cmd)  # Command run
+os.system(cmd)  # Command run
 print("Running " + cmd)
 
 
