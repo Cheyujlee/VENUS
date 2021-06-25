@@ -17,8 +17,8 @@ parser.add_argument("--read1", type=str, required=True,
                     help="read1 of bulk RNA-seq (barcode)")
 parser.add_argument("--read2", type=str, required=False,
                     help="read2 of bulk RNA-seq (cDNA)")
-parser.add_argument("--indexDir", type=str, required=False, default=human_indexDir, 
-                    help="user-specified genome index directory")
+# parser.add_argument("--indexDir", type=str, required=False, default=human_indexDir, 
+#                     help="user-specified genome index directory")
 parser.add_argument("--outDir", type=str, required=False, default=os.getcwd(), 
                     help="directory to store output")
 args = parser.parse_args()
@@ -47,7 +47,7 @@ if args.read2:
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + human_outDir + " " \
-        "--genomeDir " + args.indexDir + " " \
+        "--genomeDir " + human_indexDir + " " \
         "--readFilesIn " + args.read2 + " " + args.read1 + " " \
         "--outReadsUnmapped Fastx " + \
         "--outSAMtype None"
@@ -55,7 +55,7 @@ else:
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + human_outDir + " " \
-        "--genomeDir " + args.indexDir + " " \
+        "--genomeDir " + human_indexDir + " " \
         "--readFilesIn " + args.read1 + " " \
         "--outReadsUnmapped Fastx " + \
         "--outSAMtype None"
@@ -63,8 +63,7 @@ else:
 print("Running " + cmd)
 
 
-### Appropriately renames the indexDir and read1, read2 for the virus mapping ###
-args.indexDir=virus_indexDir
+### Appropriately renames the read1 & read2 for the virus mapping ###
 args.read1=human_outDir + "Unmapped.out.mate1.fastq"
 # os.rename(human_outDir + "Unmapped.out.mate1", args.read1)
 if args.read2:
@@ -77,14 +76,14 @@ if args.read2:
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + virus_outDir + " " \
-        "--genomeDir " + args.indexDir + " " \
+        "--genomeDir " + virus_indexDir + " " \
         "--readFilesIn " + args.read1 + " " + args.read2 + " " \
         "--outFilterMultimapNmax 1"
 else:
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + virus_outDir + " " \
-        "--genomeDir " + args.indexDir + " " \
+        "--genomeDir " + virus_indexDir + " " \
         "--readFilesIn " + args.read1 + " " \
         "--outFilterMultimapNmax 1"
 # os.system(cmd)  # Command run
