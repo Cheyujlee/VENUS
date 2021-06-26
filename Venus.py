@@ -2,10 +2,11 @@ import argparse
 import os
 import sys
 
+### Currently, the indices are un-changeable; but may be user-supplied in future ###
 # This is the current path to the default human genome index directory
 human_indexDir = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/indices/human.genomeDir/"
 # This is the current path to the default mega virus index directory
-virus_indexDir = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/indices/virus_hpv1.1.genomeDir/"
+virus_indexDir = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/indices/virus.genomeDir/"
 
 
 ### Creates the Argument Parser object ###
@@ -44,6 +45,7 @@ except:
 
 ### Concatenate and run the human mapping in bash ###
 if args.read2:
+    # bulk paired-end RNA seq
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + human_outDir + " " \
@@ -52,6 +54,7 @@ if args.read2:
         "--outReadsUnmapped Fastx " + \
         "--outSAMtype None"
 else:
+    # bulk single-end RNA seq
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + human_outDir + " " \
@@ -73,6 +76,7 @@ if args.read2:
 
 ### Concatenate and run the virus mapping in bash ###
 if args.read2:
+    # bulk paired-end RNA seq
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + virus_outDir + " " \
@@ -80,6 +84,7 @@ if args.read2:
         "--readFilesIn " + args.read1 + " " + args.read2 + " " \
         "--outFilterMultimapNmax 1"
 else:
+    # bulk single-end RNA seq
     cmd="STAR " + \
         "--runThreadN 16 " + \
         "--outFileNamePrefix " + virus_outDir + " " \
@@ -88,6 +93,11 @@ else:
         "--outFilterMultimapNmax 1"
 os.system(cmd)  # Command run
 print("Running " + cmd)
+
+
+# ### Counts & Output the mapping to the mega-virus index ###
+# os.chdir(args.outDir)
+# unique_virus = open("unique.txt", "x")
 
 
 ### local tests ###
