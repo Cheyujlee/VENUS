@@ -5,17 +5,17 @@
 #SBATCH --mem-per-cpu=4G
 #SBATCH --time=24:00:00
 #SBATCH --partition=zhanglab.p
-#SBATCH --output=/srv/disk00/cheyul1/Venus/06-27-21/run6/run6.log
+#SBATCH --output=/srv/disk00/cheyul1/Venus/06-28-21/run3/run3.log
 
 python3 /srv/disk00/cheyul1/Venus/Venus.py \
 --read1 /srv/disk00/cheyul1/Venus/data/paired-end1.fastq \
 --read2 /srv/disk00/cheyul1/Venus/data/paired-end2.fastq \
---outDir /srv/disk00/cheyul1/Venus/06-27-21/run6/
+--outDir /srv/disk00/cheyul1/Venus/06-28-21/run3/
 
 # python3 /srv/disk00/cheyul1/Venus/Venus.py \
 # --read1 /srv/disk00/cheyul1/Venus/data/single-cell1.fastq \
 # --read2 /srv/disk00/cheyul1/Venus/data/single-cell2.fastq \
-# --outDir /srv/disk00/cheyul1/Venus/06-27-21/run6/ \
+# --outDir /srv/disk00/cheyul1/Venus/06-28-21/run3/ \
 # --singleCBstart 1 \
 # --singleCBlen 16 \
 # --singleUMIstart 17 \

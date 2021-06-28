@@ -1,66 +1,79 @@
+import argparse
+import os
+import sys
 import csv
 
-### Deletes the header lines ###
-no_header_file = open("no_header.txt", "x")
-with open('Aligned.out.sam', 'r') as header:
-    for line in header.readlines():
-        if '@' not in line:
-            no_header_file.write(line)
-no_header_file.close()
+# This is the current path to the virus species metatable
+virus_species_metatable = "/srv/disk00/cheyul1/excessSTAR-2.7.8a/virus.species.txt"
+# virus_species_metatable = "virus.species.txt"                                   # For local testing
+
+def get_count(line):
+    """
+    Obtains the read counts from the initially unsorted venus.out.tsv.
+    """
+    line_fields = line.strip().split("\t")
+    return int(line_fields[1])
+
+# 1. Creates the species_reads txt file.
+#    This will be used to count the total reads
+#    and to create the unique species txt file. 
+os.chdir(args.outDir)
+with open("species_reads.txt", "x") as species_reads:
+    # with open("Aligned.out.sam") as aligned:                                    # For local testing
+    with open(os.getcwd() + "/virus/" + "Aligned.out.sam", "r") as aligned:
+        reads_total = 0
+        for line in aligned.readlines():
+            if "@" not in line:
+                species_id = line.strip().split("\t")[2]
+                species_reads.write(species_id)
+                species_reads.write("\n")
+                reads_total += 1
 
 
-### Cut only the Species column ###
-repeat_species_file = open("repeat_species.txt", "x")
-with open("no_header.txt") as no_header:
-    repeat_species = csv.reader(no_header, delimiter="\t")
-    for row in repeat_species:
-        repeat_species_file.write(row[2])
-        repeat_species_file.write("\n")
-repeat_species_file.close()
+# 2. Creates the species txt file.
+#    This will be used to loop over the unique species
+#    thus counting the reads and writing the Venus output
+with open("species_reads.txt") as species_reads: 
+    with open("species.txt", "x") as species:
+        species.writelines(set(species_reads.readlines()))
 
 
-### Obtains the Unique species ###
-repeat_species_file = open("repeat_species.txt", "r")
-unique_species_file = open("unique_species.txt", "x")
-unique_species_lines = set(repeat_species_file.readlines())
-unique_species_file.writelines(set(unique_species_lines))
-repeat_species_file.close()
-unique_species_file.close()
+# 3. Creates the venus output tsv file.
+#    Per row/specie, there will be:
+#    specie name | reads count | reads total | reads % of total
+venus = open("venus.out.tsv", "x")
+venus.close()
+with open("venus.out.tsv", "a") as venus:
+    with open("species.txt") as species:
+        for specie in species.readlines():
+            specie = specie.replace("\n", "")
+            with open(virus_species_metatable) as metatable:
+                metareader = csv.reader(metatable, delimiter="\t")
+                for row in metareader:
+                    if specie == row[0]:
+                        venus.write(row[1] + "\t")
+            with open("species_reads.txt") as species_reads:
+                reads_count = 0
+                for line in species_reads.readlines():
+                    if specie == line.replace("\n", ""):
+                        reads_count += 1
+                venus.write(str(reads_count) + "\t")
+            venus.write(str(reads_total) + "\t")
+            venus.write(str(reads_count / (reads_total * 1.0)  * 100) + "%")
+            venus.write("\n")
 
 
-### Writes the mapped virus species output file ###
-with open("repeat_species.txt") as repeat_species_file:
-    for i, l in enumerate(repeat_species_file):
-        pass
-    total_reads = i + 1
-print(total_reads)
-repeat_species_file.close()
 
+# 4. Sorts the venus output tsv file.
+#    It first reads the lines to sort,
+#    then it overwrites the venus output.
+with open("venus.out.tsv") as venus:
+    venus_lines = venus.readlines()
+    venus_lines.sort(key=get_count, reverse=True)
 
-### Matches the virus gi no. to species name ###
-venus_output_file = open("venus_output.txt", "x")
-with open("unique_species.txt") as unique_species_file:
-    for species in unique_species_file.readlines():
-        species = species.replace("\n", "")
-        print(species)
-        virus_species = csv.reader(open("virus.species.txt"), delimiter="\t")
-        for row in virus_species:
-            if species == row[0]:
-                venus_output_file.write(row[1] + "\t")
-        count_reads = 0
-        for line in open("repeat_species.txt").readlines():
-            if species == line.replace("\n", ""):
-                count_reads += 1
-        venus_output_file.write(str(count_reads) + "\t")
-        venus_output_file.write(str(count_reads / (total_reads * 1.0) * 100) + "%")
-        venus_output_file.write("\n")
+with open("venus.out.tsv", "w") as venus:
+    for line in venus_lines:
+        venus.write(line)
 
-venus_output_file.close()
-
-reader = csv.reader(open("venus_output.txt"), delimiter="\t")
-
-sorted_venus_output = open("sorted_venus_output.txt", "x")
-for line in sorted(reader, key=lambda row: row[2], reverse=True):
-    for item in line:
-        sorted_venus_output.write(item + "\t")
-    sorted_venus_output.write("\n")
+os.remove(os.getcwd() + "/species_reads.txt")
+os.remove(os.getcwd() + "/species.txt")
